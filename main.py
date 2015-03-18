@@ -1,7 +1,7 @@
 import random
 import xlsxwriter
 
-SOURCE_FILE_NAME = 'Lord of the Rings.txt'
+SOURCE_FILE_NAME = 'harry potter.txt'
 #generate a key according to length
 def generateKey(length):
     key = ""
@@ -40,6 +40,14 @@ def action(source_text, key, algorithm):
         target_text = target_text + ch
     return target_text
 
+#get the character count in text
+def getCharacterLength(text):
+    length = 0
+    for ch in text:
+        if isCharacter(ch):
+            length += 1
+    return length
+
 #count the frequency number of  character
 def countFrequeceNumber(text):
     result = [0] * 26
@@ -53,8 +61,9 @@ def countFrequeceNumber(text):
 def countFrequency(text, frequence_number):
     length = len(text)
     frequency = []
+    length_of_character = getCharacterLength(text)
     for i in range(0, 26):
-        frequency.append(float("%.4f" % (frequence_number[i] / length)))
+        frequency.append(float("%.4f" % (frequence_number[i] / length_of_character)))
     return frequency
 
 #compute the index of coincidence between the source text and encryption result
@@ -64,7 +73,8 @@ def indexOfCoincidence(text):
     for i in range(0, 26):
         sum += frequence_number[i] * (frequence_number[i] - 1)
 
-    return float(sum) / (len(text) * len(text) - 1)
+    character_length = getCharacterLength(text)
+    return float(sum)  / (character_length * (character_length - 1))
 
 #write result to a excel sheet
 def writeToSheet(length_of_key, en_frequency, de_frequency, coincidence_of_encrypt_result,
