@@ -1,3 +1,9 @@
+#import some function
+from helper import indexOfCoincidence
+from helper import trimText
+from helper import countFrequency
+
+#some constants
 STANDARD_INDEX_OF_COINCIDENCE = 0.065
 ACCEPT_CASE = 0.005
 FREQUENCE_TABLE = [0.08167, 0.01492, 0.02782, 0.04253, 0.12702, 0.02228, 0.02015, 0.06094, 0.06966, 0.00153, 0.00772
@@ -5,6 +11,7 @@ FREQUENCE_TABLE = [0.08167, 0.01492, 0.02782, 0.04253, 0.12702, 0.02228, 0.02015
 ,0.01974, 0.00074]
 #compute the key's length
 def getKeyLength(encrypt_text):
+    print("Getting the length of key...")
     key_length = 3
     while True:
         key_length += 1
@@ -16,38 +23,12 @@ def getKeyLength(encrypt_text):
         for item in index_of_coincidence:
             if abs(item - STANDARD_INDEX_OF_COINCIDENCE) > ACCEPT_CASE:
                 flag = True
-        print(flag)
         if flag:
             continue
         else:
             break
-
+    print("Getting the key's length successfully!")
     return key_length
-
-#compute the coincidence of the text
-def indexOfCoincidence(text):
-    sum = 0
-    frequence_number = countFrequeceNumber(text)
-    for i in range(0, 26):
-        sum += frequence_number[i] * (frequence_number[i] - 1)
-
-    character_length = len(trimText(text))
-    return float(sum) / (character_length * (character_length - 1))
-
-#judge a character
-def isCharacter(a):
-    if ((ord(a) >= 97 and ord(a) <= 122) or (ord(a) >= 65 and ord(a) <=90)):
-        return True
-    else:
-        return False
-
-#remove the non-English Character from text
-def trimText(text):
-    result = ""
-    for ch in text:
-        if isCharacter(ch):
-            result += ch
-    return result
 
 #divide the text into group according to length
 def getLengthedString(length, text):
@@ -57,64 +38,28 @@ def getLengthedString(length, text):
         result[i % length] += handled_text[i]
     return result
 
-#count the frequency number of  character
-def countFrequeceNumber(text):
-    result = [0] * 26
-    text = text.lower()
-    for ch in text:
-        if (isCharacter(ch)):
-            result[ord(ch) - 97] = result[ord(ch) - 97] + 1
-    return result
-
-#count the frequency of character
-def countFrequency(text):
-    frequence_number = countFrequeceNumber(text)
-    frequency = []
-    length_of_character = len(trimText(text))
-    for i in range(0, 26):
-        frequency.append(float("%.4f" % (frequence_number[i] / length_of_character)))
-    return frequency
-
 #the main part to get the key
 def findKey(key_length, encrypt_text):
-    print("Into findkey:")
+    print("Finding the key...")
     encrypt_lengthed_string = getLengthedString(key_length, encrypt_text)
     key = ""
     for keyI in range(0, len(encrypt_lengthed_string)):
-        print(countFrequency(encrypt_lengthed_string[keyI]))
         ch = findMaxFrequencyCharacter(encrypt_lengthed_string[keyI])
         key += computeSingleKeyCharacter(ch)
+    print("Finding the key successfully!")
     return key
-
-#shit a text for the purpose of guess key
-def shiftN(shift_n, text):
-    shift_result = ""
-    for ch in text:
-        if (ord(ch) - shift_n) < 97:
-            shift_result += chr((ord(ch)  - shift_n) + 26)
-        else:
-            shift_result += chr((ord(ch) - shift_n))
-    return shift_result
-
-#check whether the shift is correct
-def validate(text):
-    frequency_of_text = countFrequency(text)
-    sum = 0
-    for index in range(0, 26):
-        sum = sum + frequency_of_text[index] * FREQUENCE_TABLE[index]
-    if abs((sum - STANDARD_INDEX_OF_COINCIDENCE)) <= ACCEPT_CASE:
-        return True
-    else:
-        return False
 
 #the main part to crack a Vigenere Cipher according to encrypt text
 def cracker():
-    f_encrypt_text = open("encrypt.txt")
+    encrypt_file_name = input("Please input the encrypted(using Vigenere Cipher) file name:")
+    print("Start of Crack")
+    f_encrypt_text = open(encrypt_file_name)
     encrypt_text = f_encrypt_text.read()
     f_encrypt_text.close()
     key_length = getKeyLength(encrypt_text)
     key = findKey(key_length, encrypt_text)
-    print("The key is " + key)
+    print("The key is '" + key + "'")
+    print("End of Processing")
 
 #find the max frequency character
 def findMaxFrequencyCharacter(text):
