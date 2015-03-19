@@ -1,7 +1,7 @@
 import random
 import xlsxwriter
 
-SOURCE_FILE_NAME = 'harry potter.txt'
+SOURCE_FILE_NAME = 'Lord of the Rings.txt'
 #generate a key according to length
 def generateKey(length):
     key = ""
@@ -18,7 +18,7 @@ def isCharacter(a):
 
 # return the row of k, col of c in the encryption table
 def encryptSingle(c, k):
-    return chr((ord(c) - 97 + ord(k) - 97) % 26 + 97)
+    return chr((ord(c) - 97 + ord(k) - ord('a')) % 26 + 97)
 
 #decrypt a single character according to the decryption table
 def decryptSingle(m, k):
@@ -34,19 +34,11 @@ def action(source_text, key, algorithm):
     length_of_key = len(key)
     count = -1
     for ch in source_text:
-        count += 1
         if isCharacter(ch):
+            count += 1
             ch = algorithm(ch, key[count % length_of_key])
         target_text = target_text + ch
     return target_text
-
-#get the character count in text
-def getCharacterLength(text):
-    length = 0
-    for ch in text:
-        if isCharacter(ch):
-            length += 1
-    return length
 
 #count the frequency number of  character
 def countFrequeceNumber(text):
@@ -58,13 +50,21 @@ def countFrequeceNumber(text):
     return result
 
 #count the frequency of character
-def countFrequency(text, frequence_number):
-    length = len(text)
+def countFrequency(text):
+    frequence_number = countFrequeceNumber(text)
     frequency = []
-    length_of_character = getCharacterLength(text)
+    length_of_character = len(trimText(text))
     for i in range(0, 26):
         frequency.append(float("%.4f" % (frequence_number[i] / length_of_character)))
     return frequency
+
+#remove the non-English Character from text
+def trimText(text):
+    result = ""
+    for ch in text:
+        if isCharacter(ch):
+            result += ch
+    return result
 
 #compute the index of coincidence between the source text and encryption result
 def indexOfCoincidence(text):
@@ -73,8 +73,8 @@ def indexOfCoincidence(text):
     for i in range(0, 26):
         sum += frequence_number[i] * (frequence_number[i] - 1)
 
-    character_length = getCharacterLength(text)
-    return float(sum)  / (character_length * (character_length - 1))
+    character_length = len(trimText(text))
+    return float(sum) / (character_length * (character_length - 1))
 
 #write result to a excel sheet
 def writeToSheet(length_of_key, en_frequency, de_frequency, coincidence_of_encrypt_result,
@@ -128,12 +128,12 @@ def combineToTest():
     #count the frequency of encrypt result and decrypt result
     #for encrypt text
     print("when n = " + str(length_of_key))
-    en_frequence_number = countFrequeceNumber(encrypt_result)
-    en_frequency = countFrequency(encrypt_result, en_frequence_number)
+    #en_frequence_number = countFrequeceNumber(encrypt_result)
+    en_frequency = countFrequency(encrypt_result)
     print("frequency of encrypt result:" +  "\n" + str(en_frequency))
     #for decrypt text
-    de_frequence_number = countFrequeceNumber(decrypt_result)
-    de_frequency = countFrequency(decrypt_result, de_frequence_number)
+    #de_frequence_number = countFrequeceNumber(decrypt_result)
+    de_frequency = countFrequency(decrypt_result)
     print ("frequency of decrypt result:" + "\n" + str(de_frequency))
 
     #compute the index of coincidence
